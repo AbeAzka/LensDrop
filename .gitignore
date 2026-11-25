@@ -1,0 +1,24 @@
+## File Sensitif & Kredensial Google OAuth (WAJIB DIABAIKAN)
+credentials.json
+client_secret*.json
+token.json
+*DriveTokens*
+*.pfx
+*.snk
+.env
+
+## Build Results & Cache Visual Studio / .NET
+bin/
+obj/
+publish/
+InstallerOutput/
+*.user
+*.suo
+*.cache
+.vs/
+
+## File Sementara & Log
+*.log
+*.tmp
+Thumbs.db
+.DS_Store

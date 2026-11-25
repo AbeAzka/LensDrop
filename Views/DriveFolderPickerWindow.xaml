@@ -1,0 +1,46 @@
+<Window x:Class="LensDrop.Views.DriveFolderPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pilih Folder Tujuan di Google Drive"
+        Icon="pack://application:,,,/Assets/app.ico"
+        Height="460" Width="480"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F8FAFC"
+        FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Pilih Folder Google Drive" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+            <TextBlock Text="Media akan otomatis diunggah ke dalam folder Drive yang Anda pilih." FontSize="12" Foreground="#475569"/>
+        </StackPanel>
+
+        <!-- Buat Folder Baru di Drive -->
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="TxtNewFolder" Grid.Column="0" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Ketik nama folder baru di Google Drive..." Margin="0,0,8,0"/>
+            <Button x:Name="BtnCreateFolder" Grid.Column="1" Content="+ Buat Folder" Style="{StaticResource SecondaryButtonStyle}" Click="BtnCreateFolder_Click"/>
+        </Grid>
+
+        <!-- Daftar Folder Drive -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="4" Margin="0,0,0,14">
+            <ListBox x:Name="LstFolders" BorderThickness="0" DisplayMemberPath="Name" FontSize="13" Padding="4"/>
+        </Border>
+
+        <!-- Tombol Aksi -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Batal" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0" Click="BtnCancel_Click"/>
+            <Button Content="Pilih Folder Ini" Style="{StaticResource PrimaryButtonStyle}" Click="BtnSelect_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
