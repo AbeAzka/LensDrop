@@ -1,7 +1,7 @@
 <Window x:Class="LensDrop.Views.FeedbackWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Kirim Feedback — LensDrop Studio v0.2"
+        Title="Kirim Feedback — LensDrop Studio"
         Icon="pack://application:,,,/Assets/app.ico"
         Height="490" Width="500"
         WindowStartupLocation="CenterOwner"

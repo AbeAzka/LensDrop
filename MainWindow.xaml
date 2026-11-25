@@ -1,7 +1,7 @@
 <Window x:Class="LensDrop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LensDrop Studio v0.2 by Indodev Studio — Camera &amp; Folder Ingest, Photo Editor, Sorter &amp; Google Drive"
+        Title="LensDrop Studio — Camera &amp; Folder Ingest, Photo Editor, Sorter &amp; Google Drive"
         Icon="pack://application:,,,/Assets/app.ico"
         Height="760" Width="1220" MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
