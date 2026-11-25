@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,8 +26,7 @@ namespace LensDrop.Services
     {
         private DriveService? _driveService;
         private readonly Dictionary<string, string> _folderIdCache = new();
-        private const string TokenStoreFolder = "LensDropDriveTokens";
-        private const string TokenUserKey = "user";
+        private const string TokenUserKey = "lensdrop_default_user";
 
         private static readonly string[] Scopes =
         {
@@ -35,12 +35,33 @@ namespace LensDrop.Services
             Oauth2Service.Scope.UserinfoEmail
         };
 
+        // Lokasi folder penyimpanan token yang konsisten di AppData\Roaming\LensDrop\DriveTokens
+        public static string TokenStoreFullPath => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "LensDrop",
+            "DriveTokens"
+        );
+
         public bool IsAuthenticated => _driveService != null;
         public GoogleUserProfile? CurrentUser { get; private set; }
+        public string? LastAuthError { get; private set; }
 
         public string GetCredentialsPath(string fileName = "credentials.json")
         {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            // 1. Cek di folder instalasi / executable (AppContext.BaseDirectory aman untuk PublishSingleFile)
+            string baseDir = AppContext.BaseDirectory;
+            string p1 = Path.Combine(baseDir, fileName);
+            if (File.Exists(p1)) return p1;
+
+            // 2. Cek di AppData\Roaming\LensDrop\credentials.json (jika user meletakkan manual di AppData)
+            string p2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LensDrop", fileName);
+            if (File.Exists(p2)) return p2;
+
+            // 3. Cek di working directory saat ini
+            string p3 = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+            if (File.Exists(p3)) return p3;
+
+            return p1;
         }
 
         public bool HasCredentialsFile(string fileName = "credentials.json")
@@ -50,26 +71,59 @@ namespace LensDrop.Services
 
         public bool HasSavedToken()
         {
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string tokenFilePath = Path.Combine(
-                appDataPath,
-                TokenStoreFolder,
-                $"Google.Apis.Auth.OAuth2.Responses.TokenResponse-{TokenUserKey}"
-            );
-            return File.Exists(tokenFilePath);
+            try
+            {
+                if (!Directory.Exists(TokenStoreFullPath)) return false;
+                // Cek apakah ada file TokenResponse apapun di folder TokenStoreFullPath (termasuk migrasi dari folder lama)
+                var files = Directory.GetFiles(TokenStoreFullPath, "*TokenResponse*");
+                if (files.Length > 0) return true;
+
+                // Migrasi otomatis dari folder lama (%AppData%\LensDropDriveTokens) jika ada
+                string legacyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LensDropDriveTokens");
+                if (Directory.Exists(legacyPath))
+                {
+                    var legacyFiles = Directory.GetFiles(legacyPath, "*TokenResponse*");
+                    if (legacyFiles.Length > 0)
+                    {
+                        Directory.CreateDirectory(TokenStoreFullPath);
+                        foreach (var lf in legacyFiles)
+                        {
+                            string dest = Path.Combine(TokenStoreFullPath, $"Google.Apis.Auth.OAuth2.Responses.TokenResponse-{TokenUserKey}");
+                            File.Copy(lf, dest, overwrite: true);
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> TrySilentAuthenticateAsync(string fileName = "credentials.json")
         {
-            if (!HasSavedToken() || !HasCredentialsFile(fileName))
+            LastAuthError = null;
+            if (!HasSavedToken())
+            {
+                LastAuthError = "Belum ada sesi login tersimpan.";
                 return false;
+            }
+
+            if (!HasCredentialsFile(fileName))
+            {
+                LastAuthError = "File credentials.json tidak ditemukan.";
+                return false;
+            }
 
             try
             {
-                return await AuthenticateAsync(fileName);
+                return await AuthenticateCoreAsync(fileName, allowInteractiveBrowser: false);
             }
-            catch
+            catch (Exception ex)
             {
+                LastAuthError = ex.Message;
                 _driveService = null;
                 CurrentUser = null;
                 return false;
@@ -78,30 +132,55 @@ namespace LensDrop.Services
 
         public async Task<bool> AuthenticateAsync(string fileName = "credentials.json")
         {
+            LastAuthError = null;
+            return await AuthenticateCoreAsync(fileName, allowInteractiveBrowser: true);
+        }
+
+        private async Task<bool> AuthenticateCoreAsync(string fileName, bool allowInteractiveBrowser)
+        {
             string fullPath = GetCredentialsPath(fileName);
             if (!File.Exists(fullPath))
                 throw new FileNotFoundException(
-                    $"File '{fileName}' tidak ditemukan di folder aplikasi:\n{fullPath}\n\nPastikan file OAuth Client ID (Desktop App) sudah ditaruh di folder aplikasi."
+                    $"File '{fileName}' tidak ditemukan di folder aplikasi:\n{fullPath}\n\nPastikan file OAuth Client ID (Desktop App) sudah ditaruh di folder aplikasi atau %AppData%\\LensDrop\\."
                 );
 
+            Directory.CreateDirectory(TokenStoreFullPath);
+            var dataStore = new FileDataStore(TokenStoreFullPath, fullPath: true);
+
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+            var clientSecrets = GoogleClientSecrets.FromStream(stream).Secrets;
+
+            // Jika silent auto-login, batasi waktu tunggu agar tidak menggantung jika token dicabut
+            using var cts = allowInteractiveBrowser
+                ? new CancellationTokenSource(TimeSpan.FromMinutes(3))
+                : new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStream(stream).Secrets,
+                clientSecrets,
                 Scopes,
                 TokenUserKey,
-                CancellationToken.None,
-                new FileDataStore(TokenStoreFolder, true)
+                cts.Token,
+                dataStore
             );
+
+            // Paksa refresh access token jika sudah kedaluwarsa menggunakan RefreshToken tersimpan
+            if (credential.Token.IsStale && !string.IsNullOrEmpty(credential.Token.RefreshToken))
+            {
+                bool refreshed = await credential.RefreshTokenAsync(cts.Token);
+                if (!refreshed && !allowInteractiveBrowser)
+                {
+                    throw new InvalidOperationException("Refresh token kedaluwarsa, silakan login ulang secara manual.");
+                }
+            }
 
             var initializer = new BaseClientService.Initializer
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "LensDrop Studio by Indodev Studio"
+                ApplicationName = "LensDrop Studio v0.2 by Indodev Studio"
             };
 
             _driveService = new DriveService(initializer);
 
-            // Ambil informasi profil Google (Nama, Email, Foto Profil)
             try
             {
                 var oauthService = new Oauth2Service(initializer);
@@ -115,7 +194,6 @@ namespace LensDrop.Services
             }
             catch
             {
-                // Fallback jika scope userinfo belum disetujui pada token lama
                 var aboutReq = _driveService.About.Get();
                 aboutReq.Fields = "user(displayName,emailAddress,photoLink)";
                 var about = await aboutReq.ExecuteAsync();
@@ -132,8 +210,11 @@ namespace LensDrop.Services
 
         public async Task LogoutAsync()
         {
-            var store = new FileDataStore(TokenStoreFolder, true);
-            await store.ClearAsync();
+            if (Directory.Exists(TokenStoreFullPath))
+            {
+                var store = new FileDataStore(TokenStoreFullPath, fullPath: true);
+                await store.ClearAsync();
+            }
             _driveService = null;
             CurrentUser = null;
             _folderIdCache.Clear();
@@ -225,9 +306,9 @@ namespace LensDrop.Services
 
             var response = await request.ExecuteAsync();
             var list = new List<DriveFolderItem>
-    {
-        new DriveFolderItem { Id = "root", Name = "My Drive (Root Utama)", DisplayPath = "" }
-    };
+            {
+                new DriveFolderItem { Id = "root", Name = "My Drive (Root Utama)", DisplayPath = "" }
+            };
 
             if (response.Files != null)
             {

@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Pilih Folder Tujuan di Google Drive"
         Icon="pack://application:,,,/Assets/app.ico"
-        Height="460" Width="480"
+        Height="440" Width="460"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#F8FAFC"
+        Background="{DynamicResource BgPrimaryBrush}"
         FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
 
-    <Grid Margin="20">
+    <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -17,24 +17,24 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,12">
-            <TextBlock Text="Pilih Folder Google Drive" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
-            <TextBlock Text="Media akan otomatis diunggah ke dalam folder Drive yang Anda pilih." FontSize="12" Foreground="#475569"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Pilih Folder Google Drive" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="Media akan otomatis diunggah ke dalam folder Drive yang Anda pilih." FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
 
         <!-- Buat Folder Baru di Drive -->
-        <Grid Grid.Row="1" Margin="0,0,0,12">
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="TxtNewFolder" Grid.Column="0" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Ketik nama folder baru di Google Drive..." Margin="0,0,8,0"/>
-            <Button x:Name="BtnCreateFolder" Grid.Column="1" Content="+ Buat Folder" Style="{StaticResource SecondaryButtonStyle}" Click="BtnCreateFolder_Click"/>
+            <TextBox x:Name="TxtNewFolder" Grid.Column="0" Height="30" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Ketik nama folder baru di Google Drive..." Margin="0,0,8,0"/>
+            <Button x:Name="BtnCreateFolder" Grid.Column="1" Content="+ Buat Folder" Height="30" Style="{StaticResource SecondaryButtonStyle}" Click="BtnCreateFolder_Click"/>
         </Grid>
 
         <!-- Daftar Folder Drive -->
-        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="4" Margin="0,0,0,14">
-            <ListBox x:Name="LstFolders" BorderThickness="0" DisplayMemberPath="Name" FontSize="13" Padding="4"/>
+        <Border Grid.Row="2" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="10" Padding="4" Margin="0,0,0,12">
+            <ListBox x:Name="LstFolders" BorderThickness="0" DisplayMemberPath="Name" FontSize="12.5" Padding="4"/>
         </Border>
 
         <!-- Tombol Aksi -->

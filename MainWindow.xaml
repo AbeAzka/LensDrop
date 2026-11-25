@@ -1,22 +1,22 @@
 <Window x:Class="LensDrop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LensDrop Studio by Indodev Studio — Camera Ingest, Photo Editor, Sorter &amp; Google Drive"
+        Title="LensDrop Studio v0.2 by Indodev Studio — Camera &amp; Folder Ingest, Photo Editor, Sorter &amp; Google Drive"
         Icon="pack://application:,,,/Assets/app.ico"
-        Height="790" Width="1220" MinHeight="680" MinWidth="1020"
+        Height="760" Width="1220" MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BgPrimaryBrush}"
+        Background="{DynamicResource BgPrimaryBrush}"
         FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="68"/>
+            <RowDefinition Height="56"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="76"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
 
-        <!-- TOP APP BAR WITH GOOGLE PROFILE -->
-        <Border Grid.Row="0" Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="24,0">
+        <!-- TOP APP BAR (COMPACT) -->
+        <Border Grid.Row="0" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="18,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -26,46 +26,46 @@
 
                 <!-- Brand Identity -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<Image Source="pack://application:,,,/Assets/logo.png"
+                    <Image Source="pack://application:,,,/Assets/logo.png"
                            Width="32"
                            Height="32"
                            RenderOptions.BitmapScalingMode="HighQuality"
-                           Margin="0,0,12,0"/>
+                           Margin="0,0,10,0"/>
                     <StackPanel VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="LensDrop" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <Border Background="{StaticResource PrimaryLightBrush}" CornerRadius="5" Padding="7,2" Margin="8,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="STUDIO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                            <TextBlock Text="LensDrop" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <Border Background="{DynamicResource PrimaryLightBrush}" CornerRadius="4" Padding="6,1.5" Margin="7,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="STUDIO v0.2" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
                             </Border>
                         </StackPanel>
-                        <TextBlock Text="Camera Ingest, Non-Destructive Photo Editor &amp; Auto-Sorter" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="By Indodev Studio" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Google Account Profile & Auto-Login -->
+                <!-- Theme Switcher, Profile, Feedback & Settings -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                   
                     <CheckBox x:Name="ChkAutoLoginDrive"
-                              Content="Auto-login saat dibuka"
+                              Content="Auto-login"
                               IsChecked="True"
                               Style="{StaticResource ModernCheckBoxStyle}"
-                              Margin="0,0,14,0"
+                              Margin="0,0,10,0"
                               Checked="ChkAutoLoginDrive_Changed"
                               Unchecked="ChkAutoLoginDrive_Changed"/>
 
-                    <!-- Profile Pill -->
+                    <!-- Compact Profile Pill -->
                     <Border x:Name="BadgeDriveStatus"
-                            Background="{StaticResource BgSubtleBrush}"
-                            BorderBrush="{StaticResource BorderSubtleBrush}"
+                            Background="{DynamicResource BgSubtleBrush}"
+                            BorderBrush="{DynamicResource BorderSubtleBrush}"
                             BorderThickness="1"
-                            CornerRadius="20"
-                            Padding="6,4,14,4"
-                            Margin="0,0,10,0"
+                            CornerRadius="16"
+                            Padding="5,3,12,3"
+                            Margin="0,0,8,0"
                             VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal">
-                            <!-- Avatar Circle -->
-                            <Grid Width="30" Height="30" Margin="0,0,10,0">
+                            <Grid Width="26" Height="26" Margin="0,0,8,0">
                                 <Ellipse x:Name="AvatarBg" Fill="#CBD5E1"/>
-                                <TextBlock x:Name="TxtAvatarInitials" Text="G" Foreground="White" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TxtAvatarInitials" Text="G" Foreground="White" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Ellipse x:Name="AvatarImageEllipse" Visibility="Collapsed">
                                     <Ellipse.Fill>
                                         <ImageBrush x:Name="BrushAvatarImage" Stretch="UniformToFill"/>
@@ -74,27 +74,29 @@
                             </Grid>
 
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock x:Name="TxtProfileName" Text="Akun Google Belum Login" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                <TextBlock x:Name="TxtProfileEmail" Text="Klik Login Google untuk profil &amp; sync Drive" FontSize="10.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="TxtProfileName" Text="Akun Google Belum Login" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock x:Name="TxtProfileEmail" Text="Klik Login untuk sync Drive" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Button x:Name="BtnLoginDrive" Content="Login dengan Google" Style="{StaticResource PrimaryButtonStyle}" Click="BtnLoginDrive_Click"/>
+                    <Button x:Name="BtnLoginDrive" Content="Login Google" Height="30" Padding="12,0" Style="{StaticResource PrimaryButtonStyle}" Click="BtnLoginDrive_Click" Margin="0,0,6,0"/>
+                    <Button x:Name="BtnFeedback" Content="💬" Width="32" Height="30" Padding="0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnFeedback_Click" Margin="0,0,6,0" ToolTip="Kirim saran atau laporan bug"/>
+                    <Button x:Name="BtnSettings" Content="⚙" Width="32" Height="30" Padding="0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnSettings_Click" ToolTip="Pengaturan Aplikasi"/>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- MAIN WORKSPACE -->
-        <Grid Grid.Row="1" Margin="24,16,24,16">
+        <Grid Grid.Row="1" Margin="16,12,16,12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- CARD 1: SOURCE KAMERA (USB & WI-FI) -->
-            <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12" Padding="14,12">
+            <!-- CARD 1: SOURCE MEDIA (COMPACT) -->
+            <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" Margin="0,0,0,10" Padding="12,9">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -102,76 +104,79 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!--<Border Background="{StaticResource PrimaryLightBrush}" Width="34" Height="34" CornerRadius="8" Margin="0,0,12,0">
-                            <TextBlock Text="📷" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>-->
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Sumber Kamera (USB MTP &amp; Wi-Fi PTP/IP)" FontSize="13.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <TextBlock x:Name="TxtCameraHint" Text="Deteksi otomatis via kabel USB atau sambungkan lewat IP Wi-Fi kamera" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
-                        </StackPanel>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Sumber Media (Kamera USB / Wi-Fi atau Folder Lokal)" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock x:Name="TxtCameraHint" Text="Deteksi kamera otomatis, sambung Wi-Fi, atau pilih folder foto/video di PC" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ComboBox x:Name="CmbCameras" Width="250" Style="{StaticResource ModernComboBoxStyle}" DisplayMemberPath="DisplayName" SelectionChanged="CmbCameras_SelectionChanged" Margin="0,0,8,0"/>
-                        <Button x:Name="BtnRefreshCameras" Content="⟳ Scan Ulang" Style="{StaticResource SecondaryButtonStyle}" Click="BtnRefreshCameras_Click" Margin="0,0,12,0"/>
+                        <ComboBox x:Name="CmbCameras"
+                                  Width="225"
+                                  Height="30"
+                                  Style="{StaticResource ModernComboBoxStyle}"
+                                  VerticalContentAlignment="Center"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectionChanged="CmbCameras_SelectionChanged"
+                                  Margin="0,0,6,0"/>
+                        <Button x:Name="BtnRefreshCameras" Content="⟳ Scan" Height="30" Padding="10,0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnRefreshCameras_Click" Margin="0,0,6,0" ToolTip="Scan ulang kamera USB"/>
+                        <Button x:Name="BtnSelectSourceFolder" Content="📂 Folder Lokal" Height="30" Padding="12,0" Style="{StaticResource PrimaryButtonStyle}" Click="BtnSelectSourceFolder_Click" Margin="0,0,10,0" ToolTip="Sortir, edit &amp; upload foto dari folder PC"/>
 
-                        <Border Width="1" Background="{StaticResource BorderSubtleBrush}" Margin="0,4,12,4"/>
+                        <Border Width="1" Height="22" Background="{DynamicResource BorderSubtleBrush}" Margin="0,0,10,0"/>
 
-                        <TextBox x:Name="TxtWifiIp" Width="140" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Masukkan alamat IP Wi-Fi kamera (Contoh: 192.168.1.45)" Margin="0,0,8,0"/>
-                        <Button x:Name="BtnAddWifiIp" Content="+ Konek Wi-Fi" Style="{StaticResource SecondaryButtonStyle}" Click="BtnAddWifiIp_Click"/>
+                        <TextBox x:Name="TxtWifiIp" Width="125" Height="30" VerticalContentAlignment="Center" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Alamat IP Wi-Fi kamera (Contoh: 192.168.1.45)" Margin="0,0,6,0"/>
+                        <Button x:Name="BtnAddWifiIp" Content="+ Wi-Fi IP" Height="30" Padding="10,0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnAddWifiIp_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- CARD 2: KONFIGURASI PENYIMPANAN, SORTIR OTOMATIS & CLOUD -->
-            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12" Padding="14,12">
+            <!-- CARD 2: PENYIMPANAN, SORTIR OTOMATIS & CLOUD (COMPACT) -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" Margin="0,0,0,10" Padding="12,10">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.25*"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="1.55*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="1.6*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Kolom Kiri: Folder Tujuan & Google Drive -->
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="1. LOKASI PENYIMPANAN &amp; CLOUD" FontSize="11" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="1. LOKASI PENYIMPANAN &amp; GOOGLE DRIVE" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,6"/>
 
-                        <Grid Margin="0,0,0,8">
+                        <Grid Margin="0,0,0,6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="TxtOutputDir" Grid.Column="0" Style="{StaticResource ModernTextBoxStyle}" IsReadOnly="True" Margin="0,0,8,0"/>
-                            <Button x:Name="BtnBrowseDir" Grid.Column="1" Content="Pilih Folder..." Style="{StaticResource SecondaryButtonStyle}" Click="BtnBrowseDir_Click"/>
+                            <TextBox x:Name="TxtOutputDir" Grid.Column="0" Height="30" VerticalContentAlignment="Center" Style="{StaticResource ModernTextBoxStyle}" IsReadOnly="True" Margin="0,0,6,0"/>
+                            <Button x:Name="BtnBrowseDir" Grid.Column="1" Content="Folder Output..." Height="30" Padding="10,0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnBrowseDir_Click"/>
                         </Grid>
 
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="*"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<CheckBox x:Name="ChkUploadDrive" Grid.Column="0" Content="Sync ke Drive:" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,8,0"/>
-							<TextBox x:Name="TxtDriveRootFolder" Grid.Column="1" Text="LensDrop_Backup" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,8,0" TextChanged="TxtDriveRootFolder_TextChanged"/>
-							<Button x:Name="BtnBrowseDriveFolder" Grid.Column="2" Content="Pilih Drive..." Style="{StaticResource SecondaryButtonStyle}" Click="BtnBrowseDriveFolder_Click"/>
-						</Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkUploadDrive" Grid.Column="0" Content="Sync Drive:" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,8,0" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
+                            <TextBox x:Name="TxtDriveRootFolder" Grid.Column="1" Height="30" VerticalContentAlignment="Center" Text="LensDrop_Backup" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,6,0" TextChanged="TxtDriveRootFolder_TextChanged"/>
+                            <Button x:Name="BtnBrowseDriveFolder" Grid.Column="2" Content="Pilih Drive..." Height="30" Padding="10,0" Style="{StaticResource SecondaryButtonStyle}" Click="BtnBrowseDriveFolder_Click"/>
+                        </Grid>
                     </StackPanel>
 
-                    <Border Grid.Column="1" Width="1" Background="{StaticResource BorderSubtleBrush}" HorizontalAlignment="Center"/>
+                    <Border Grid.Column="1" Width="1" Background="{DynamicResource BorderSubtleBrush}" HorizontalAlignment="Center"/>
 
                     <!-- Kolom Kanan: Aturan Sortir Otomatis -->
                     <StackPanel Grid.Column="2">
-                        <DockPanel Margin="0,0,0,8">
-                            <TextBlock Text="2. ATURAN SORTIR MEDIA OTOMATIS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-                            <TextBlock x:Name="TxtFolderPreview" Text="Preview: ...\Images6-11-25" FontSize="11" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                        <DockPanel Margin="0,0,0,6">
+                            <TextBlock Text="2. ATURAN SORTIR MEDIA OTOMATIS" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+                            <TextBlock x:Name="TxtFolderPreview" Text="Preview: ...\Images\2026-11-25" FontSize="10.5" Foreground="{DynamicResource SuccessBrush}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                         </DockPanel>
 
-                        <WrapPanel Margin="0,0,0,8">
-                            <CheckBox x:Name="ChkSeparateType" Content="Pisah Foto &amp; Video" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,14,4" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
-                            <CheckBox x:Name="ChkGroupDate" Content="Folder Tanggal (YYYY-MM-DD)" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,14,4" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
-                            <CheckBox x:Name="ChkGroupModel" Content="Folder Seri Kamera" IsChecked="False" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,14,4" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
-                            <CheckBox x:Name="ChkRenameTimestamp" Content="Prefix Tanggal di Nama File" IsChecked="False" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,4"/>
+                        <WrapPanel Margin="0,0,0,6">
+                            <CheckBox x:Name="ChkSeparateType" Content="Pisah Foto &amp; Video" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,12,2" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
+                            <CheckBox x:Name="ChkGroupDate" Content="Folder Tanggal (YYYY-MM-DD)" IsChecked="True" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,12,2" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
+                            <CheckBox x:Name="ChkGroupModel" Content="Folder Seri Kamera" IsChecked="False" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,12,2" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
+                            <CheckBox x:Name="ChkRenameTimestamp" Content="Prefix Tanggal File" IsChecked="False" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,2" Checked="SortRule_Changed" Unchecked="SortRule_Changed"/>
                         </WrapPanel>
 
                         <Grid>
@@ -179,36 +184,54 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Sub-Folder Proyek / Event (Opsional):" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBox x:Name="TxtCustomEventFolder" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Contoh: Wedding_Andi, Liburan_Bromo" TextChanged="TxtCustomEventFolder_TextChanged"/>
+                            <TextBlock Grid.Column="0" Text="Sub-Folder Proyek / Event:" FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox x:Name="TxtCustomEventFolder" Grid.Column="1" Height="30" VerticalContentAlignment="Center" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Contoh: Wedding_Andi, Liburan_Bromo" TextChanged="TxtCustomEventFolder_TextChanged"/>
                         </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- CARD 3: GALERI MEDIA, SORTIR TAMPILAN & EDITOR FOTO -->
-            <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="0">
+            <!-- CARD 3: GALERI MEDIA, DROPDOWN FILTER & EDITOR -->
+            <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" Padding="0">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="52"/>
+                        <RowDefinition Height="44"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Toolbar Filter, Urutkan & Edit -->
-                    <Border Grid.Row="0" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="14,0">
+                    <!-- Toolbar Compact -->
+                    <Border Grid.Row="0" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="12,0">
                         <Grid>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="Pilih Semua" Style="{StaticResource SecondaryButtonStyle}" Padding="10,5" Click="BtnSelectAll_Click" Margin="0,0,6,0"/>
-                                <Button Content="Batal Pilih" Style="{StaticResource SecondaryButtonStyle}" Padding="10,5" Click="BtnDeselectAll_Click" Margin="0,0,10,0"/>
+                                <Button Content="Pilih Semua" Height="28" Style="{StaticResource SecondaryButtonStyle}" Padding="9,0" FontSize="11.5" Click="BtnSelectAll_Click" Margin="0,0,5,0"/>
+                                <Button Content="Batal Pilih" Height="28" Style="{StaticResource SecondaryButtonStyle}" Padding="9,0" FontSize="11.5" Click="BtnDeselectAll_Click" Margin="0,0,8,0"/>
 
-                                <ComboBox x:Name="CmbFilterType" Width="135" Height="30" SelectedIndex="0" SelectionChanged="CmbFilterType_SelectionChanged" Margin="0,0,8,0">
+                                <Border Width="1" Height="20" Background="{DynamicResource BorderSubtleBrush}" Margin="0,0,8,0"/>
+
+                                <!-- Dropdown Filter dengan Style Konsisten -->
+                                <ComboBox x:Name="CmbFilterType"
+                                          Width="135"
+                                          Height="28"
+                                          SelectedIndex="0"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          VerticalContentAlignment="Center"
+                                          SelectionChanged="CmbFilterType_SelectionChanged"
+                                          Margin="0,0,6,0">
                                     <ComboBoxItem Content="Semua Media"/>
                                     <ComboBoxItem Content="Hanya Foto"/>
                                     <ComboBoxItem Content="Hanya Video"/>
                                     <ComboBoxItem Content="Sudah Diedit"/>
                                 </ComboBox>
 
-                                <ComboBox x:Name="CmbSortOrder" Width="165" Height="30" SelectedIndex="0" SelectionChanged="CmbSortOrder_SelectionChanged" Margin="0,0,8,0">
+                                <!-- Dropdown Sortir dengan Style Konsisten -->
+                                <ComboBox x:Name="CmbSortOrder"
+                                          Width="175"
+                                          Height="28"
+                                          SelectedIndex="0"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          VerticalContentAlignment="Center"
+                                          SelectionChanged="CmbSortOrder_SelectionChanged"
+                                          Margin="0,0,6,0">
                                     <ComboBoxItem Content="Urutkan: Nama (A-Z)"/>
                                     <ComboBoxItem Content="Urutkan: Nama (Z-A)"/>
                                     <ComboBoxItem Content="Urutkan: Ukuran Terbesar"/>
@@ -216,43 +239,59 @@
                                     <ComboBoxItem Content="Urutkan: Tipe File"/>
                                 </ComboBox>
 
-                                <TextBox x:Name="TxtSearchMedia" Width="170" Height="30" Style="{StaticResource ModernTextBoxStyle}" ToolTip="Cari nama file..." TextChanged="TxtSearchMedia_TextChanged"/>
+                                <TextBox x:Name="TxtSearchMedia"
+                                         Width="170"
+                                         Height="28"
+                                         VerticalContentAlignment="Center"
+                                         Style="{StaticResource ModernTextBoxStyle}"
+                                         ToolTip="Cari nama file..."
+                                         TextChanged="TxtSearchMedia_TextChanged"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <Button x:Name="BtnEditSelectedPhoto" Content="✎ Edit Foto Terpilih" Style="{StaticResource PrimaryButtonStyle}" Padding="12,6" Click="BtnEditSelectedPhoto_Click" Margin="0,0,12,0"/>
-                                <TextBlock x:Name="TxtSummaryStats" Text="0 file dipilih (0 MB)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                <Button x:Name="BtnEditSelectedPhoto" Content="✎ Edit Foto Terpilih" Height="28" Style="{StaticResource PrimaryButtonStyle}" Padding="11,0" FontSize="11.5" Click="BtnEditSelectedPhoto_Click" Margin="0,0,10,0"/>
+                                <TextBlock x:Name="TxtSummaryStats" Text="0 file dipilih (0 MB)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                     </Border>
 
                     <!-- DataGrid Media -->
-                    <DataGrid x:Name="GridMedia" Grid.Row="1" AutoGenerateColumns="False" MouseDoubleClick="GridMedia_MouseDoubleClick">
+                    <DataGrid x:Name="GridMedia"
+                              Grid.Row="1"
+                              AutoGenerateColumns="False"
+                              RowHeight="34"
+                              ColumnHeaderHeight="34"
+                              Background="{DynamicResource BgSurfaceBrush}"
+                              Foreground="{DynamicResource TextPrimaryBrush}"
+                              BorderThickness="0"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{DynamicResource BorderSubtleBrush}"
+                              MouseDoubleClick="GridMedia_MouseDoubleClick">
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="Pilih" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="56"/>
+                            <DataGridCheckBoxColumn Header="Pilih" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                             <DataGridTextColumn Header="Nama File" Binding="{Binding FileName}" Width="*" IsReadOnly="True"/>
 
-                            <DataGridTemplateColumn Header="Tipe" Width="88">
+                            <DataGridTemplateColumn Header="Tipe" Width="82">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border CornerRadius="6" Padding="8,3" HorizontalAlignment="Left">
+                                        <Border CornerRadius="5" Padding="7,2" HorizontalAlignment="Left">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding MediaType}" Value="Video">
-                                                            <Setter Property="Background" Value="{StaticResource PurpleLightBrush}"/>
+                                                            <Setter Property="Background" Value="{DynamicResource PurpleLightBrush}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock Text="{Binding Extension}" FontSize="11" FontWeight="Bold">
+                                            <TextBlock Text="{Binding Extension}" FontSize="10.5" FontWeight="Bold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding MediaType}" Value="Video">
-                                                                <Setter Property="Foreground" Value="{StaticResource PurpleTextBrush}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource PurpleTextBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -263,31 +302,31 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="Ukuran" Binding="{Binding FileSizeFormatted}" Width="95" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Ukuran" Binding="{Binding FileSizeFormatted}" Width="90" IsReadOnly="True"/>
 
                             <!-- Kolom Status Edit Foto -->
-                            <DataGridTemplateColumn Header="Edit Foto" Width="150">
+                            <DataGridTemplateColumn Header="Edit Foto" Width="140">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Border CornerRadius="6" Padding="8,3" Margin="0,0,6,0" VerticalAlignment="Center">
+                                            <Border CornerRadius="5" Padding="7,2" Margin="0,0,6,0" VerticalAlignment="Center">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="{StaticResource BgSubtleBrush}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource BgSubtleBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding HasPendingEdits}" Value="True">
-                                                                <Setter Property="Background" Value="#FEF3C7"/>
+                                                                <Setter Property="Background" Value="{DynamicResource WarningLightBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <TextBlock Text="{Binding EditBadgeText}" FontSize="11" FontWeight="SemiBold">
+                                                <TextBlock Text="{Binding EditBadgeText}" FontSize="10.5" FontWeight="SemiBold">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding HasPendingEdits}" Value="True">
-                                                                    <Setter Property="Foreground" Value="#B45309"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -297,11 +336,11 @@
 
                                             <Button Content="✎"
                                                     ToolTip="Edit foto ini"
-                                                    Padding="7,2"
-                                                    FontSize="11"
+                                                    Padding="6,1.5"
+                                                    FontSize="10.5"
                                                     Cursor="Hand"
-                                                    Background="{StaticResource PrimaryLightBrush}"
-                                                    Foreground="{StaticResource PrimaryBrush}"
+                                                    Background="{DynamicResource PrimaryLightBrush}"
+                                                    Foreground="{DynamicResource PrimaryBrush}"
                                                     BorderThickness="0"
                                                     Click="BtnEditRowPhoto_Click">
                                                 <Button.Style>
@@ -320,22 +359,22 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header="Status Transfer" Width="195">
+                            <DataGridTemplateColumn Header="Status Transfer" Width="185">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="Medium">
+                                        <TextBlock Text="{Binding Status}" FontSize="11.5" FontWeight="Medium">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding StatusCategory}" Value="Processing">
-                                                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding StatusCategory}" Value="Done">
-                                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding StatusCategory}" Value="Error">
-                                                            <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -350,25 +389,25 @@
             </Border>
         </Grid>
 
-        <!-- BOTTOM ACTION & PROGRESS FOOTER -->
-        <Border Grid.Row="2" Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="24,0">
+        <!-- BOTTOM ACTION & PROGRESS FOOTER (COMPACT) -->
+        <Border Grid.Row="2" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="18,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,24,0">
-                    <Grid Margin="0,0,0,6">
-                        <TextBlock x:Name="TxtLog" Text="Siap. Hubungkan kamera Anda melalui USB atau Wi-Fi untuk mulai." FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}"/>
-                        <TextBlock x:Name="TxtProgressPercent" Text="" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right"/>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Grid Margin="0,0,0,5">
+                        <TextBlock x:Name="TxtLog" Text="Siap. Hubungkan kamera Anda atau klik 'Folder Lokal' untuk mulai." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock x:Name="TxtProgressPercent" Text="" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryBrush}" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar x:Name="ProgressTotal" Height="7" Minimum="0" Maximum="100" Value="0" Background="{StaticResource BgPrimaryBrush}" Foreground="{StaticResource PrimaryBrush}" BorderThickness="0"/>
+                    <ProgressBar x:Name="ProgressTotal" Height="6" Minimum="0" Maximum="100" Value="0" Background="{DynamicResource BgPrimaryBrush}" Foreground="{DynamicResource PrimaryBrush}" BorderThickness="0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button x:Name="BtnOpenOutputFolder" Content="Buka Folder Hasil" Style="{StaticResource SecondaryButtonStyle}" Padding="14,10" Margin="0,0,10,0" Click="BtnOpenOutputFolder_Click"/>
-                    <Button x:Name="BtnStartProcess" Content="Mulai Export, Edit &amp; Upload" Style="{StaticResource SuccessButtonStyle}" Padding="20,11" FontSize="13.5" Click="BtnStartProcess_Click"/>
+                    <Button x:Name="BtnOpenOutputFolder" Content="Buka Folder Hasil" Height="34" Style="{StaticResource SecondaryButtonStyle}" Padding="12,0" Margin="0,0,8,0" Click="BtnOpenOutputFolder_Click"/>
+                    <Button x:Name="BtnStartProcess" Content="Mulai Sortir, Edit &amp; Upload" Height="34" Style="{StaticResource SuccessButtonStyle}" Padding="16,0" FontSize="12.5" Click="BtnStartProcess_Click"/>
                 </StackPanel>
             </Grid>
         </Border>

@@ -1,8 +1,5 @@
-; Script Installer Inno Setup untuk LensDrop Studio v2.0.0
-; Dikembangkan oleh Indodev Studio
-
 #define MyAppName "LensDrop Studio"
-#define MyAppVersion "2.0.0"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "Indodev Studio"
 #define MyAppURL "https://indodevstudio.my.id"
 #define MyAppExeName "LensDrop.exe"
@@ -35,7 +32,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Pastikan Anda sudah menjalankan 'dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true' terlebih dahulu
 Source: "..\bin\Release\net8.0-windows\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]

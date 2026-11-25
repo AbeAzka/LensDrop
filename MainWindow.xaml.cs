@@ -30,6 +30,14 @@ namespace LensDrop
         public bool GroupDate { get; set; } = true;
         public bool GroupModel { get; set; } = false;
         public bool RenameTimestamp { get; set; } = false;
+
+        // Pengaturan Aplikasi v0.2
+        public bool DefaultUploadToDrive { get; set; } = true;
+        public bool IncludeSubfoldersOnFolderImport { get; set; } = true;
+        public bool CopyLocalFolderFiles { get; set; } = true;
+        public bool AutoScanUsbOnConnect { get; set; } = true;
+        public int DefaultJpegQuality { get; set; } = 95;
+        public string LastImportedLocalFolder { get; set; } = string.Empty;
     }
 
     public partial class MainWindow : Window
@@ -96,13 +104,24 @@ namespace LensDrop
                 );
             }
 
+            ApplyPreferencesToUi();
+        }
+
+        private void ApplyPreferencesToUi()
+        {
+            bool prevReady = _isUiReady;
+            _isUiReady = false;
+
             ChkAutoLoginDrive.IsChecked = _prefs.AutoLoginGoogle;
             TxtOutputDir.Text = _prefs.OutputDirectory;
             TxtDriveRootFolder.Text = _prefs.DriveRootFolder;
+            ChkUploadDrive.IsChecked = _prefs.DefaultUploadToDrive;
             ChkSeparateType.IsChecked = _prefs.SeparateType;
             ChkGroupDate.IsChecked = _prefs.GroupDate;
             ChkGroupModel.IsChecked = _prefs.GroupModel;
             ChkRenameTimestamp.IsChecked = _prefs.RenameTimestamp;
+
+            _isUiReady = prevReady;
         }
 
         private void SavePreferences()
@@ -113,6 +132,7 @@ namespace LensDrop
                 _prefs.AutoLoginGoogle = ChkAutoLoginDrive.IsChecked == true;
                 _prefs.OutputDirectory = TxtOutputDir.Text;
                 _prefs.DriveRootFolder = TxtDriveRootFolder.Text;
+                _prefs.DefaultUploadToDrive = ChkUploadDrive.IsChecked == true;
                 _prefs.SeparateType = ChkSeparateType.IsChecked == true;
                 _prefs.GroupDate = ChkGroupDate.IsChecked == true;
                 _prefs.GroupModel = ChkGroupModel.IsChecked == true;
@@ -133,7 +153,7 @@ namespace LensDrop
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == WM_DEVICECHANGE && wParam.ToInt32() == DBT_DEVICEARRIVAL)
+            if (msg == WM_DEVICECHANGE && wParam.ToInt32() == DBT_DEVICEARRIVAL && _prefs.AutoScanUsbOnConnect)
             {
                 Dispatcher.InvokeAsync(async () =>
                 {
@@ -148,8 +168,14 @@ namespace LensDrop
 
         private async Task AutoLoginGoogleIfEnabledAsync()
         {
-            if (ChkAutoLoginDrive.IsChecked != true || !_driveService.HasSavedToken())
+            if (ChkAutoLoginDrive.IsChecked != true)
                 return;
+
+            if (!_driveService.HasSavedToken())
+            {
+                SetGoogleProfileUi(false);
+                return;
+            }
 
             TxtProfileName.Text = "Memulihkan sesi Google...";
             TxtProfileEmail.Text = "Auto-login ke Drive & Profil";
@@ -157,6 +183,15 @@ namespace LensDrop
 
             bool restored = await _driveService.TrySilentAuthenticateAsync("credentials.json");
             SetGoogleProfileUi(restored);
+
+            if (restored)
+            {
+                TxtLog.Text = $"Auto-login Google berhasil sebagai {_driveService.CurrentUser?.Name}.";
+            }
+            else if (!string.IsNullOrWhiteSpace(_driveService.LastAuthError))
+            {
+                TxtLog.Text = $"Sesi Google perlu diperbarui: {_driveService.LastAuthError}";
+            }
         }
 
         private void SetGoogleProfileUi(bool isConnected)
@@ -187,8 +222,8 @@ namespace LensDrop
                     AvatarImageEllipse.Visibility = Visibility.Collapsed;
                 }
 
-                BadgeDriveStatus.Background = new SolidColorBrush(Color.FromRgb(236, 253, 245));
-                BadgeDriveStatus.BorderBrush = new SolidColorBrush(Color.FromRgb(167, 243, 208));
+                BadgeDriveStatus.SetResourceReference(Border.BackgroundProperty, "SuccessLightBrush");
+                BadgeDriveStatus.SetResourceReference(Border.BorderBrushProperty, "SuccessBorderBrush");
 
                 BtnLoginDrive.Content = "Logout";
                 BtnLoginDrive.Background = new SolidColorBrush(Color.FromRgb(220, 38, 38));
@@ -202,10 +237,10 @@ namespace LensDrop
                 AvatarBg.Fill = new SolidColorBrush(Color.FromRgb(148, 163, 184));
                 AvatarImageEllipse.Visibility = Visibility.Collapsed;
 
-                BadgeDriveStatus.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252));
-                BadgeDriveStatus.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+                BadgeDriveStatus.SetResourceReference(Border.BackgroundProperty, "BgSubtleBrush");
+                BadgeDriveStatus.SetResourceReference(Border.BorderBrushProperty, "BorderSubtleBrush");
 
-                BtnLoginDrive.Content = "Login dengan Google";
+                BtnLoginDrive.Content = "Login Google";
                 BtnLoginDrive.Background = new SolidColorBrush(Color.FromRgb(37, 99, 235));
                 BtnLoginDrive.IsEnabled = true;
             }
@@ -240,7 +275,7 @@ namespace LensDrop
             catch (Exception ex)
             {
                 SetGoogleProfileUi(false);
-                MessageBox.Show($"Gagal login Google:\n{ex.Message}", "Login Google", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Gagal login Google: {ex.Message}", "Login Google", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -249,14 +284,18 @@ namespace LensDrop
             SavePreferences();
         }
 
-        // ==================== CAMERA DISCOVERY & SCAN ====================
+        // ==================== CAMERA & LOCAL FOLDER SOURCE ====================
 
         private async Task RefreshCamerasAndScanAsync()
         {
             BtnRefreshCameras.IsEnabled = false;
             TxtLog.Text = "Mencari kamera USB dan Wi-Fi di jaringan...";
 
-            foreach (var src in _availableSources) src.Disconnect();
+            // Pertahankan sumber folder lokal yang sudah ditambahkan user sebelumnya
+            var existingFolders = _availableSources.OfType<LocalFolderSource>().ToList();
+            foreach (var src in _availableSources.Where(s => s is not LocalFolderSource))
+                src.Disconnect();
+
             _availableSources.Clear();
             CmbCameras.Items.Clear();
 
@@ -272,6 +311,11 @@ namespace LensDrop
                 _availableSources.Add(new WifiPtpIpCameraSource(ip));
             }
 
+            foreach (var folderSrc in existingFolders)
+            {
+                _availableSources.Add(folderSrc);
+            }
+
             foreach (var src in _availableSources)
             {
                 CmbCameras.Items.Add(src);
@@ -280,30 +324,66 @@ namespace LensDrop
             if (CmbCameras.Items.Count > 0)
             {
                 CmbCameras.SelectedIndex = 0;
-                TxtCameraHint.Text = $"{CmbCameras.Items.Count} sumber kamera terdeteksi dan siap dibaca.";
+                TxtCameraHint.Text = $"{CmbCameras.Items.Count} sumber media siap dibaca.";
             }
             else
             {
                 _mediaItems.Clear();
                 UpdateSummaryStats();
-                TxtCameraHint.Text = "Belum ada kamera terdeteksi. Colok USB atau masukkan IP Wi-Fi kamera.";
-                TxtLog.Text = "Tidak ada kamera yang terdeteksi.";
+                TxtCameraHint.Text = "Belum ada kamera terdeteksi. Colok USB, masukkan IP Wi-Fi, atau klik 'Buka Folder Lokal'.";
+                TxtLog.Text = "Tidak ada kamera terdeteksi. Anda tetap bisa memilih folder foto/video lokal.";
             }
 
             BtnRefreshCameras.IsEnabled = true;
         }
 
+        private void BtnSelectSourceFolder_Click(object sender, RoutedEventArgs e)
+        {
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "Pilih Folder Sumber Foto / Video (Tanpa Kamera)",
+                UseDescriptionForTitle = true,
+                SelectedPath = Directory.Exists(_prefs.LastImportedLocalFolder)
+                    ? _prefs.LastImportedLocalFolder
+                    : Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            };
+
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK || string.IsNullOrWhiteSpace(dialog.SelectedPath))
+                return;
+
+            string selectedFolder = dialog.SelectedPath;
+            _prefs.LastImportedLocalFolder = selectedFolder;
+            SavePreferences();
+
+            // Hapus entri folder yang sama jika sudah ada agar tidak duplikat
+            var duplicate = _availableSources
+                .OfType<LocalFolderSource>()
+                .FirstOrDefault(f => string.Equals(f.FolderPath, selectedFolder, StringComparison.OrdinalIgnoreCase));
+
+            if (duplicate != null)
+            {
+                _availableSources.Remove(duplicate);
+                CmbCameras.Items.Remove(duplicate);
+            }
+
+            var folderSource = new LocalFolderSource(selectedFolder, _prefs.IncludeSubfoldersOnFolderImport);
+            _availableSources.Add(folderSource);
+            CmbCameras.Items.Add(folderSource);
+            CmbCameras.SelectedItem = folderSource;
+            TxtCameraHint.Text = $"Mode Folder Lokal aktif: {selectedFolder}";
+        }
+
         private async void CmbCameras_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (CmbCameras.SelectedItem is not ICameraSource selectedCamera) return;
+            if (CmbCameras.SelectedItem is not ICameraSource selectedSource) return;
 
-            TxtLog.Text = $"Membaca daftar media dari {selectedCamera.DisplayName}...";
+            TxtLog.Text = $"Membaca daftar media dari {selectedSource.DisplayName}...";
             _mediaItems.Clear();
             UpdateSummaryStats();
 
             try
             {
-                var items = await selectedCamera.ScanMediaAsync();
+                var items = await selectedSource.ScanMediaAsync();
                 foreach (var item in items)
                 {
                     item.PropertyChanged += (_, args) =>
@@ -317,12 +397,12 @@ namespace LensDrop
                 ApplySortOrder();
                 _mediaView?.Refresh();
                 UpdateSummaryStats();
-                TxtLog.Text = $"Ditemukan {items.Count} file media pada {selectedCamera.DisplayName}. Klik ganda foto untuk mengedit.";
+                TxtLog.Text = $"Ditemukan {items.Count} file media pada {selectedSource.DisplayName}. Klik ganda foto untuk mengedit.";
             }
             catch (Exception ex)
             {
-                TxtLog.Text = "Gagal membaca media dari kamera.";
-                MessageBox.Show($"Gagal membaca media dari kamera:\n{ex.Message}", "Koneksi Kamera", MessageBoxButton.OK, MessageBoxImage.Error);
+                TxtLog.Text = "Gagal membaca media dari sumber.";
+                MessageBox.Show($"Gagal membaca media: {ex.Message}", "Sumber Media", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -356,18 +436,23 @@ namespace LensDrop
                 return;
             }
 
-            if (CmbCameras.SelectedItem is not ICameraSource activeCamera) return;
+            if (CmbCameras.SelectedItem is not ICameraSource activeSource) return;
 
             try
             {
                 if (string.IsNullOrWhiteSpace(item.LocalCachedPath) || !File.Exists(item.LocalCachedPath))
                 {
-                    TxtLog.Text = $"Mengunduh pratinjau {item.FileName} dari kamera untuk diedit...";
+                    TxtLog.Text = $"Mengunduh pratinjau {item.FileName} untuk diedit...";
                     string previewCacheDir = Path.Combine(Path.GetTempPath(), "LensDrop_EditCache");
-                    item.LocalCachedPath = await activeCamera.DownloadFileAsync(item, previewCacheDir);
+                    item.LocalCachedPath = await activeSource.DownloadFileAsync(item, previewCacheDir);
                 }
 
-                var editorWin = new PhotoEditorWindow(item.FileName, item.LocalCachedPath, item.EditSettings)
+                var initialSettings = item.EditSettings ?? new PhotoEditSettings
+                {
+                    JpegQuality = Math.Clamp(_prefs.DefaultJpegQuality, 70, 100)
+                };
+
+                var editorWin = new PhotoEditorWindow(item.FileName, item.LocalCachedPath, initialSettings)
                 {
                     Owner = this
                 };
@@ -384,7 +469,7 @@ namespace LensDrop
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Gagal membuka editor foto:\n{ex.Message}", "Studio Edit Foto", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Gagal membuka editor foto: {ex.Message}", "Studio Edit Foto", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -444,19 +529,19 @@ namespace LensDrop
 
             switch (CmbSortOrder.SelectedIndex)
             {
-                case 0: // Nama A-Z
+                case 0:
                     _mediaView.SortDescriptions.Add(new SortDescription(nameof(CameraMediaItem.FileName), ListSortDirection.Ascending));
                     break;
-                case 1: // Nama Z-A
+                case 1:
                     _mediaView.SortDescriptions.Add(new SortDescription(nameof(CameraMediaItem.FileName), ListSortDirection.Descending));
                     break;
-                case 2: // Ukuran Terbesar
+                case 2:
                     _mediaView.SortDescriptions.Add(new SortDescription(nameof(CameraMediaItem.FileSizeBytes), ListSortDirection.Descending));
                     break;
-                case 3: // Ukuran Terkecil
+                case 3:
                     _mediaView.SortDescriptions.Add(new SortDescription(nameof(CameraMediaItem.FileSizeBytes), ListSortDirection.Ascending));
                     break;
-                case 4: // Tipe File
+                case 4:
                     _mediaView.SortDescriptions.Add(new SortDescription(nameof(CameraMediaItem.Extension), ListSortDirection.Ascending));
                     break;
             }
@@ -533,13 +618,48 @@ namespace LensDrop
             });
         }
 
+        // ==================== SETTINGS & FEEDBACK DIALOGS ====================
+
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsWin = new SettingsWindow(_prefs) { Owner = this };
+            if (settingsWin.ShowDialog() == true)
+            {
+                if (settingsWin.ResetRequested)
+                {
+                    _prefs = new AppUserPreferences
+                    {
+                        OutputDirectory = Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                            "LensDrop"
+                        )
+                    };
+                }
+                else
+                {
+                    _prefs = settingsWin.WorkingPrefs;
+                }
+
+                ApplyPreferencesToUi();
+                UpdateFolderPreview();
+                SavePreferences();
+                TxtLog.Text = "Pengaturan aplikasi diperbarui.";
+            }
+        }
+
+        private void BtnFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            var feedbackWin = new FeedbackWindow(_driveService.CurrentUser?.Email) { Owner = this };
+            feedbackWin.ShowDialog();
+        }
+
         // ==================== EXPORT, EDIT & UPLOAD PIPELINE ====================
 
         private async void BtnStartProcess_Click(object sender, RoutedEventArgs e)
         {
-            if (CmbCameras.SelectedItem is not ICameraSource activeCamera)
+            if (CmbCameras.SelectedItem is not ICameraSource activeSource)
             {
-                MessageBox.Show("Pilih sumber kamera terlebih dahulu.", "Kamera Belum Dipilih", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Pilih sumber kamera atau klik 'Buka Folder Lokal' terlebih dahulu.", "Sumber Belum Dipilih", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -569,7 +689,7 @@ namespace LensDrop
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Login Google gagal:\n{ex.Message}", "Error Auth", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show($"Login Google gagal: {ex.Message}", "Error Auth", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                 }
@@ -581,9 +701,12 @@ namespace LensDrop
 
             BtnStartProcess.IsEnabled = false;
             BtnRefreshCameras.IsEnabled = false;
+            BtnSelectSourceFolder.IsEnabled = false;
+
             string stagingDir = Path.Combine(Path.GetTempPath(), "LensDrop_Staging");
             Directory.CreateDirectory(stagingDir);
 
+            bool isLocalFolderMode = activeSource is LocalFolderSource;
             bool separateType = ChkSeparateType.IsChecked == true;
             bool groupDate = ChkGroupDate.IsChecked == true;
             bool groupModel = ChkGroupModel.IsChecked == true;
@@ -600,8 +723,8 @@ namespace LensDrop
                 try
                 {
                     item.StatusCategory = "Processing";
-                    item.Status = "Mengunduh dari kamera...";
-                    TxtLog.Text = $"[{completed + 1}/{total}] Mengunduh {item.FileName}...";
+                    item.Status = isLocalFolderMode ? "Menyiapkan file lokal..." : "Mengunduh dari kamera...";
+                    TxtLog.Text = $"[{completed + 1}/{total}] Memproses {item.FileName}...";
 
                     string workingFile;
                     if (!string.IsNullOrWhiteSpace(item.LocalCachedPath) && File.Exists(item.LocalCachedPath))
@@ -611,7 +734,7 @@ namespace LensDrop
                     }
                     else
                     {
-                        workingFile = await activeCamera.DownloadFileAsync(item, stagingDir);
+                        workingFile = await activeSource.DownloadFileAsync(item, stagingDir);
                     }
 
                     // Terapkan edit foto jika ada
@@ -636,6 +759,13 @@ namespace LensDrop
                         customEventFolder,
                         renamePrefix
                     );
+
+                    // Jika sumber folder lokal dan mode Move (bukan Copy), hapus file sumber asli setelah tersortir
+                    if (isLocalFolderMode && !_prefs.CopyLocalFolderFiles && File.Exists(item.RemotePath) &&
+                        !string.Equals(item.RemotePath, sortResult.LocalSortedPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        try { File.Delete(item.RemotePath); } catch { }
+                    }
 
                     if (uploadToDrive && _driveService.IsAuthenticated)
                     {
@@ -673,6 +803,7 @@ namespace LensDrop
             TxtLog.Text = $"Selesai! {completed} dari {total} file berhasil diproses ke {baseOutputDir}.";
             BtnStartProcess.IsEnabled = true;
             BtnRefreshCameras.IsEnabled = true;
+            BtnSelectSourceFolder.IsEnabled = true;
         }
 
         private async void BtnBrowseDriveFolder_Click(object sender, RoutedEventArgs e)
@@ -686,7 +817,7 @@ namespace LensDrop
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Silakan login Google terlebih dahulu:\n{ex.Message}", "Login Google", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Silakan login Google terlebih dahulu: {ex.Message}", "Login Google", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
             }

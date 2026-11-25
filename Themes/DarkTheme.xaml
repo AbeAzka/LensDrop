@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="BgPrimaryBrush" Color="#0B1120"/>
+    <SolidColorBrush x:Key="BgSurfaceBrush" Color="#111827"/>
+    <SolidColorBrush x:Key="BgSubtleBrush" Color="#1E293B"/>
+    <SolidColorBrush x:Key="BorderSubtleBrush" Color="#334155"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="#3B82F6"/>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B"/>
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#3B82F6"/>
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#2563EB"/>
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#1E3A8A"/>
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
+    <SolidColorBrush x:Key="SuccessHoverBrush" Color="#059669"/>
+    <SolidColorBrush x:Key="SuccessLightBrush" Color="#064E3B"/>
+    <SolidColorBrush x:Key="SuccessBorderBrush" Color="#065F46"/>
+
+    <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
+    <SolidColorBrush x:Key="DangerLightBrush" Color="#450A0A"/>
+
+    <SolidColorBrush x:Key="PurpleLightBrush" Color="#3B0764"/>
+    <SolidColorBrush x:Key="PurpleTextBrush" Color="#D8B4FE"/>
+
+    <SolidColorBrush x:Key="WarningLightBrush" Color="#451A03"/>
+    <SolidColorBrush x:Key="WarningTextBrush" Color="#FBBF24"/>
+</ResourceDictionary>

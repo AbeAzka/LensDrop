@@ -1,5 +1,5 @@
 @echo off
-title Build Installer LensDrop Studio v2.0.0 - Indodev Studio
+title Build Installer LensDrop Studio v0.2.0 - Indodev Studio
 echo ========================================================
 echo   1. Membersihkan build lama & Publish Self-Contained
 echo ========================================================
@@ -17,13 +17,14 @@ echo.
 echo ========================================================
 echo   2. Mengompilasi Installer dengan Inno Setup (ISCC)
 echo ========================================================
-set ISCC_PATH="C:\Program Files\Inno Setup 7\ISCC.exe"
+set ISCC_PATH="C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+if not exist %ISCC_PATH% set ISCC_PATH="C:\Program Files\Inno Setup 7\ISCC.exe"
 if exist %ISCC_PATH% (
     %ISCC_PATH% "Installer\LensDrop_Setup.iss"
     echo.
     echo [SUKSES] File installer siap di folder InstallerOutput\
 ) else (
-    echo [INFO] Inno Setup 6 tidak ditemukan di lokasi default.
+    echo [INFO] Inno Setup tidak ditemukan di lokasi default.
     echo Hasil publish siap dibungkus di: bin\Release\net8.0-windows\win-x64\publish\
     echo Buka file Installer\LensDrop_Setup.iss menggunakan Inno Setup Compiler secara manual.
 )

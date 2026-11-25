@@ -14,18 +14,28 @@
     <Product>LensDrop Studio</Product>
     <Company>Indodev Studio</Company>
     <Authors>Abqary Azka Siswanto — Indodev Studio</Authors>
-    <Description>Universal Camera Media Ingest, Photo Editor, Auto-Sorter &amp; Google Drive Sync</Description>
-    <Version>2.0.0</Version>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
+    <Description>Universal Camera &amp; Local Folder Media Ingest, Photo Editor, Auto-Sorter &amp; Google Drive Sync</Description>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\app.ico" />
+    <None Remove="Assets\logo.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.78.0.4327" />
     <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
     <PackageReference Include="MediaDevices" Version="1.9.1" />
     <PackageReference Include="MetadataExtractor" Version="2.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\logo.png" />
   </ItemGroup>
 
   <!-- Global Using Aliases untuk mencegah bentrok WPF vs WindowsForms -->
@@ -37,11 +47,6 @@
     <Using Include="System.Windows.MessageBox" Alias="MessageBox" />
     <Using Include="System.Windows.Clipboard" Alias="Clipboard" />
     <Using Include="System.Windows.Controls.UserControl" Alias="UserControl" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\app.ico" />
-    <Resource Include="Assets\logo.png" />
   </ItemGroup>
 
   <ItemGroup>

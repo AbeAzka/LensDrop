@@ -1,0 +1,69 @@
+<Window x:Class="LensDrop.Views.FeedbackWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kirim Feedback — LensDrop Studio v0.2"
+        Icon="pack://application:,,,/Assets/app.ico"
+        Height="490" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource BgPrimaryBrush}"
+        FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Kirim Masukan &amp; Laporan Bug" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="Bantu Indodev Studio meningkatkan LensDrop v0.2 dengan saran atau laporan kendala Anda." FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="{DynamicResource BgSurfaceBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+            <StackPanel>
+                <TextBlock Text="Kategori Feedback" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                <ComboBox x:Name="CmbFeedbackCategory" Style="{StaticResource ModernComboBoxStyle}" SelectedIndex="0" Margin="0,0,0,10">
+                    <ComboBoxItem Content="Saran Fitur Baru"/>
+                    <ComboBoxItem Content="Laporan Bug / Error"/>
+                    <ComboBoxItem Content="Kompatibilitas Kamera / Folder"/>
+                    <ComboBoxItem Content="Sinkronisasi Google Drive"/>
+                    <ComboBoxItem Content="Lainnya"/>
+                </ComboBox>
+
+                <TextBlock Text="Nama / Email Anda (Opsional)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtSenderContact" Height="30" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Detail Pesan" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtFeedbackMessage"
+                         Height="135"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"
+                         Padding="9,7"
+                         Background="{DynamicResource BgSubtleBrush}"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         CaretBrush="{DynamicResource TextPrimaryBrush}"
+                         BorderBrush="{DynamicResource BorderSubtleBrush}"
+                         BorderThickness="1"
+                         FontSize="12"/>
+
+                <CheckBox x:Name="ChkIncludeDiagInfo"
+                          Content="Sertakan info versi aplikasi (v0.2.0) &amp; OS Windows untuk diagnostik"
+                          IsChecked="True"
+                          Style="{StaticResource ModernCheckBoxStyle}"
+                          Margin="0,10,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <Button Content="Buka Halaman Kontak Web" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Click="BtnOpenWebContact_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Batal" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0" Click="BtnCancel_Click"/>
+                <Button x:Name="BtnSendFeedback" Content="Kirim Feedback" Style="{StaticResource PrimaryButtonStyle}" Click="BtnSendFeedback_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
